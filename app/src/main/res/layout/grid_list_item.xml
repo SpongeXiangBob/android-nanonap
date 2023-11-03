@@ -1,0 +1,28 @@
+<com.zxy.nanonap.layout.SquareLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="10dp"
+    android:gravity="center"
+    android:background="@drawable/rounded_border_background_light"> <!-- 设置背景为圆角边框 -->
+
+    <ImageView
+        android:id="@+id/iconImageView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/abc_vector_test"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iconImageView"
+        android:layout_alignLeft="@+id/iconImageView"
+        android:textSize="13sp"
+        android:maxLines="1"
+        android:text="Label"
+        android:textAlignment="center"
+        android:gravity="center" /> <!-- 文字居中显示 -->
+
+</com.zxy.nanonap.layout.SquareLayout>

@@ -1,0 +1,12 @@
+<resources>
+    <!-- Base application theme for dark mode -->
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <!-- Customize your theme here -->
+        <item name="colorPrimary">@color/colorPrimaryDarkMode</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkDarkMode</item>
+        <item name="colorAccent">@color/colorAccentDarkMode</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- 其他样式和颜色设置，可根据需要进行调整 -->
+    </style>
+</resources>

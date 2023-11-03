@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/sky_dark"
+    tools:context=".activity.MainActivity">
+
+    <GridView
+        android:id="@+id/buttonGridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="15dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="50dp"
+        android:clipToPadding="false"
+        android:numColumns="3" /> <!-- 设置列数为3，可以根据需要调整 -->
+
+    <!-- 长方框悬浮视图 -->
+    <LinearLayout
+        android:id="@+id/floatingControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="#88000000"
+        android:padding="0dp">
+
+        <ImageButton
+            android:id="@+id/btnPlayPause"
+            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_play_white"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <ImageButton
+            android:id="@+id/volumeButton"
+            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_shengyin_white"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <ImageButton
+            android:id="@+id/alarmButton"
+            android:layout_weight="1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_alarm_white"
+            android:background="?android:attr/selectableItemBackground" />
+
+    </LinearLayout>
+
+</RelativeLayout>

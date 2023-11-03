@@ -1,0 +1,44 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:id="@+id/volumeItemLayout"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- 音量图标（可根据需要自定义） -->
+        <ImageView
+            android:id="@+id/volumeIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_shengyin_white" />
+
+        <TextView
+            android:id="@+id/volumeValueTextView"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:text="50%"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <!-- 音量调节进度条 -->
+    <SeekBar
+        android:id="@+id/volumeSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:splitTrack="false"
+        android:thumb="@drawable/ic_hand_full"
+        android:max="100" />
+
+</LinearLayout>
