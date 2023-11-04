@@ -69,4 +69,24 @@ public class DateUtil {
         return calendar;
     }
 
+    // hhmmss转化成秒数
+    public static long hms2Seconds(String hms) {
+        String[] timeComponents = hms.split(":");
+        int hours = Integer.parseInt(timeComponents[0]);
+        int minutes = Integer.parseInt(timeComponents[1]);
+        int seconds = Integer.parseInt(timeComponents[2]);
+
+        return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    // 秒数转化成hhmmss
+    public static String seconds2HMS(long seconds) {
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long remainingSeconds = seconds % 60;
+
+        return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds);
+    }
+
+
 }

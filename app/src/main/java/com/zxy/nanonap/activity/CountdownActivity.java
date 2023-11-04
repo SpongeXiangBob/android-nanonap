@@ -2,11 +2,15 @@ package com.zxy.nanonap.activity;
 
 import android.app.Activity;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
@@ -22,6 +26,8 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.listener.OnTimeSelectListener;
@@ -57,10 +63,24 @@ public class CountdownActivity extends Activity {
      */
     private Date lastSelectedDate;
 
+    private BroadcastReceiver countdownReceiver;
+    private String leftTimeStr;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 注册广播接收器
+        countdownReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                long millisUntilFinished = intent.getLongExtra("countdown", 0);
+                // 倒计时 剩余时间
+                countdownTextView.setText(DateUtil.seconds2HMS(millisUntilFinished / 1000));
+                leftTimeStr = DateUtil.seconds2HMS(millisUntilFinished / 1000);
+            }
+        };
         // 没绑定服务才需要重新绑定
         if (!((MainActivity) MyApplication.getInstance().getMainActivityContext()).getIsServiceTimeBound()) {
             ((MainActivity) MyApplication.getInstance().getMainActivityContext()).bindCountdownService();
@@ -101,6 +121,7 @@ public class CountdownActivity extends Activity {
         // 页面刚打开时 根据当前状态 设置各个按钮的可用状态
         toggleTimeButtonStyle();
 
+        countdownTextView.setText(null != leftTimeStr && !"".equals(leftTimeStr) ? leftTimeStr : "00:00:00");
 
         // 设置下滑手势关闭页面
         final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
@@ -161,9 +182,9 @@ public class CountdownActivity extends Activity {
                     Intent intent = new Intent(MyApplication.getInstance().getMainActivityContext(), CountdownService.class);
                     startService(intent);
                 }
-                // 开启服务计时
-
-
+                // 开始计时
+                long second = DateUtil.hms2Seconds(countdownTextView.getText().toString());
+                ((MainActivity) MyApplication.getInstance().getMainActivityContext()).setCountTimerSecond(second * 1000);
             }
         });
 
@@ -178,16 +199,16 @@ public class CountdownActivity extends Activity {
                     case HAS_TIME_PLAYING:
                         // 切换按钮文字 暂停
 
-                        // 暂停服务
-
+                        // 暂停计时
+                        ((MainActivity) MyApplication.getInstance().getMainActivityContext()).pauseCountTime();
                         // 更新状态
                         setCurTimeStatus(TimerStatus.HAS_TIME_PAUSE);
                         break;
                     case HAS_TIME_PAUSE:
                         // 切换按钮文字 继续
 
-                        // 继续服务
-
+                        // 继续计时
+                        ((MainActivity) MyApplication.getInstance().getMainActivityContext()).resumeCountTime();
                         // 更新状态
                         setCurTimeStatus(TimerStatus.HAS_TIME_PLAYING);
                         break;
@@ -289,6 +310,18 @@ public class CountdownActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(countdownReceiver, new IntentFilter("countdown"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(countdownReceiver);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
@@ -312,7 +345,7 @@ public class CountdownActivity extends Activity {
             Intent intent = new Intent(MyApplication.getInstance().getMainActivityContext(), CountdownService.class);
             stopService(intent);
         }
-        ((MainActivity) MyApplication.getInstance().getMainActivityContext()).cancleBindTimeService();
+//        ((MainActivity) MyApplication.getInstance().getMainActivityContext()).cancleBindTimeService();
     }
 
     private TimerStatus getCurTimeStatus() {

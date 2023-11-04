@@ -8,15 +8,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.zxy.nanonap.R;
 import com.zxy.nanonap.activity.CountdownActivity;
 import com.zxy.nanonap.activity.MainActivity;
 
 public class CountdownService extends Service {
+
+    private CountDownTimer countDownTimer;
+    private long timeLeftInMillis;
+    private volatile boolean isPaused;
 
     @Override
     public void onCreate() {
@@ -28,16 +34,66 @@ public class CountdownService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // 创建并显示前台通知
         createNotification();
         return START_STICKY;
+    }
+
+    private void startCountDownTimer() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                if (!isPaused) {
+                    // 每秒刷新一次倒计时 发送广播通知Activity刷新UI
+                    Intent intent = new Intent("countdown");
+                    intent.putExtra("countdown", millisUntilFinished);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                } else {
+                    cancel();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                // 计时结束时的操作
+            }
+        };
+        countDownTimer.start();
     }
 
     @Override
     public void onDestroy() {
         // 移除前台通知
         stopForeground(true);
+        // 停止倒计时 (防止内存泄漏-计时器与前台通知同时清除)
+        pauseCountDown();
+        timeLeftInMillis = 0L;
     }
+
+    // 暂停计时
+    public synchronized void pauseCountDown() {
+        isPaused = true;
+        if (countDownTimer != null) {
+            countDownTimer.cancel(); // 取消计时器
+            countDownTimer = null;
+        }
+    }
+
+    // 继续计时
+    public synchronized void resumeCountDown() {
+        isPaused = false;
+        startCountDownTimer();
+    }
+
+    // 设置倒计时时间
+    public synchronized void setCountDownTime(long millisInFuture) {
+        timeLeftInMillis = millisInFuture;
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        resumeCountDown();
+    }
+
 
     @Override
     public IBinder onBind(Intent intent) {

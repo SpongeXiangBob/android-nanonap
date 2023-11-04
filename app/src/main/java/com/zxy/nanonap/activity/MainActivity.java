@@ -2,18 +2,22 @@ package com.zxy.nanonap.activity;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.Vibrator;
@@ -417,6 +421,27 @@ public class MainActivity extends Activity {
      */
     public TimerStatus getCurTimerStatus(){
         return this.curTimerStatus;
+    }
+
+    /**
+     * 暂停计时
+     */
+    public void pauseCountTime() {
+        countdownService.pauseCountDown();
+    }
+
+    /**
+     * 恢复计时
+     */
+    public void resumeCountTime() {
+        countdownService.resumeCountDown();
+    }
+
+    /**
+     * 自定义倒计时时间（毫秒）
+     */
+    public void setCountTimerSecond(long mills) {
+        countdownService.setCountDownTime(mills);
     }
 
 }

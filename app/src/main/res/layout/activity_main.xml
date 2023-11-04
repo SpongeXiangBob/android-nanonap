@@ -22,7 +22,8 @@
     <LinearLayout
         android:id="@+id/floatingControls"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
+        android:layout_marginBottom="5dp"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:background="#88000000"
@@ -31,24 +32,24 @@
         <ImageButton
             android:id="@+id/btnPlayPause"
             android:layout_weight="1"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:src="@drawable/ic_play_white"
             android:background="?android:attr/selectableItemBackground" />
 
         <ImageButton
             android:id="@+id/volumeButton"
             android:layout_weight="1"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:src="@drawable/ic_shengyin_white"
             android:background="?android:attr/selectableItemBackground" />
 
         <ImageButton
             android:id="@+id/alarmButton"
             android:layout_weight="1"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:src="@drawable/ic_alarm_white"
             android:background="?android:attr/selectableItemBackground" />
 
