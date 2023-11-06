@@ -70,6 +70,7 @@ public class CountdownActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MyApplication.getInstance().setCountActivityContext(this);
 
         // 注册广播接收器
         countdownReceiver = new BroadcastReceiver() {
@@ -121,6 +122,9 @@ public class CountdownActivity extends Activity {
         // 页面刚打开时 根据当前状态 设置各个按钮的可用状态
         toggleTimeButtonStyle();
 
+        if (getCurTimeStatus().getValue() == TimerStatus.HAS_TIME_PAUSE.getValue()) {
+            leftTimeStr = DateUtil.seconds2HMS(((MainActivity) MyApplication.getInstance().getMainActivityContext()).getLeftMills() / 1000);
+        }
         countdownTextView.setText(null != leftTimeStr && !"".equals(leftTimeStr) ? leftTimeStr : "00:00:00");
 
         // 设置下滑手势关闭页面
@@ -177,10 +181,6 @@ public class CountdownActivity extends Activity {
                 if (((MainActivity) MyApplication.getInstance().getMainActivityContext()).getIsServiceTimeBound()) {
                     Intent intent = new Intent(MyApplication.getInstance().getMainActivityContext(), CountdownService.class);
                     startService(intent);
-                } else {
-                    ((MainActivity) MyApplication.getInstance().getMainActivityContext()).bindCountdownService();
-                    Intent intent = new Intent(MyApplication.getInstance().getMainActivityContext(), CountdownService.class);
-                    startService(intent);
                 }
                 // 开始计时
                 long second = DateUtil.hms2Seconds(countdownTextView.getText().toString());
@@ -197,16 +197,12 @@ public class CountdownActivity extends Activity {
                 // 更新计时状态
                 switch (getCurTimeStatus()) {
                     case HAS_TIME_PLAYING:
-                        // 切换按钮文字 暂停
-
                         // 暂停计时
                         ((MainActivity) MyApplication.getInstance().getMainActivityContext()).pauseCountTime();
                         // 更新状态
                         setCurTimeStatus(TimerStatus.HAS_TIME_PAUSE);
                         break;
                     case HAS_TIME_PAUSE:
-                        // 切换按钮文字 继续
-
                         // 继续计时
                         ((MainActivity) MyApplication.getInstance().getMainActivityContext()).resumeCountTime();
                         // 更新状态
@@ -240,6 +236,7 @@ public class CountdownActivity extends Activity {
                     case HAS_TIME_PAUSE:
                         // 关时间服务
                         closeTimerService();
+                        ((MainActivity) MyApplication.getInstance().getMainActivityContext()).removeTimeForeService();
                         // 改状态
                         setCurTimeStatus(TimerStatus.NO_TIME_RESET);
                         break;
@@ -324,21 +321,39 @@ public class CountdownActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        MyApplication.getInstance().setCountActivityContext(null);
+        if (getCurTimeStatus().getValue() == TimerStatus.HAS_TIME_NO_START.getValue()) {
+            setCurTimeStatus(TimerStatus.NO_TIME_NO_START);
+            toggleTimeButtonStyle();
+        }
     }
 
     /**
      * 切换按钮样式
      */
-    private void toggleTimeButtonStyle() {
+    public void toggleTimeButtonStyle() {
         int[] curStatusButtonEnableArray = ButtonConst.buttonEnableArray[getCurTimeStatus().getValue()];
         startButton.setEnabled(curStatusButtonEnableArray[0] == 1);
         pauseButton.setEnabled(curStatusButtonEnableArray[1] == 1);
         resetButton.setEnabled(curStatusButtonEnableArray[2] == 1);
         selectTimeButton.setEnabled(curStatusButtonEnableArray[3] == 1);
+
+        startButton.setAlpha(curStatusButtonEnableArray[0] == 1 ? 1.0f : 0.2f);
+        pauseButton.setAlpha(curStatusButtonEnableArray[1] == 1 ? 1.0f : 0.2f);
+        resetButton.setAlpha(curStatusButtonEnableArray[2] == 1 ? 1.0f : 0.2f);
+        selectTimeButton.setAlpha(curStatusButtonEnableArray[3] == 1 ? 1.0f : 0.2f);
+
+        if (TimerStatus.HAS_TIME_PAUSE.getValue() == getCurTimeStatus().getValue()) {
+            pauseButton.setImageResource(R.drawable.clock_start_black);
+        } else {
+            pauseButton.setImageResource(R.drawable.clock_pause_black);
+        }
+
     }
 
     /**
      * 关掉时间服务（本Activity可用）
+     * TODO 但是不要接触绑定服务 因为要保证服务单例
      */
     private void closeTimerService(){
         if (((MainActivity) MyApplication.getInstance().getMainActivityContext()).getIsServiceTimeBound()) {

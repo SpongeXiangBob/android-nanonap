@@ -17,6 +17,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.zxy.nanonap.R;
 import com.zxy.nanonap.activity.CountdownActivity;
 import com.zxy.nanonap.activity.MainActivity;
+import com.zxy.nanonap.common.MyApplication;
 
 public class CountdownService extends Service {
 
@@ -55,7 +56,8 @@ public class CountdownService extends Service {
 
             @Override
             public void onFinish() {
-                // 计时结束时的操作
+                // todo 计时结束时的操作
+                ((MainActivity) MyApplication.getInstance().getMainActivityContext()).timeEndEvent();
             }
         };
         countDownTimer.start();
@@ -68,6 +70,7 @@ public class CountdownService extends Service {
         // 停止倒计时 (防止内存泄漏-计时器与前台通知同时清除)
         pauseCountDown();
         timeLeftInMillis = 0L;
+        System.out.println("计时服务已经停止");
     }
 
     // 暂停计时
@@ -92,6 +95,11 @@ public class CountdownService extends Service {
             countDownTimer.cancel();
         }
         resumeCountDown();
+    }
+
+    // 返回剩余时间
+    public long getTimeLeftInMillis() {
+        return this.timeLeftInMillis;
     }
 
 
@@ -128,8 +136,8 @@ public class CountdownService extends Service {
         // 创建通知内容
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_alarm_black)
-                .setContentTitle("正在倒计时")
-                .setContentText("计时中-点击返回计时页面……")
+                .setContentTitle("【正在倒计时】")
+                .setContentText("【计时服务开启中】点击返回计时页面！")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         // 设置通知点击后的操作（例如打开音乐播放界面）

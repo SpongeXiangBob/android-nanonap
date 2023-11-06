@@ -92,6 +92,7 @@ public class AudioService extends Service {
         audioVolumeMap.clear();
         // 移除前台通知
         stopForeground(true);
+        System.out.println("音乐服务停止");
     }
 
     @Override
@@ -187,6 +188,12 @@ public class AudioService extends Service {
         audioVolumeMap.remove(audioResourceId);
     }
 
+    public void clearAllRes() {
+        mediaPlayers.clear();
+        audioResources.clear();
+        audioVolumeMap.clear();
+    }
+
     // ========= 前台服务 ==========
 
     private static final int NOTIFICATION_ID = 1;
@@ -209,8 +216,8 @@ public class AudioService extends Service {
         // 创建通知内容
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.mogui)
-                .setContentTitle("正在播放音乐")
-                .setContentText("音乐名称或其他信息")
+                .setContentTitle("【正在使用音频服务】")
+                .setContentText("小翔翔提醒你【早点休息吧，晚安鸭！！！】")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         // 设置通知点击后的操作（例如打开音乐播放界面）

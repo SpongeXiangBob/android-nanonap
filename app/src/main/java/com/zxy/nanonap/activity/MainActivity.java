@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -23,6 +25,8 @@ import android.os.Parcelable;
 import android.os.Vibrator;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.CycleInterpolator;
 import android.view.animation.TranslateAnimation;
@@ -31,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -47,8 +52,11 @@ import com.zxy.nanonap.outter.CustomBottomDialog;
 import com.zxy.nanonap.service.AudioService;
 import com.zxy.nanonap.service.CountdownService;
 import com.zxy.nanonap.util.AudioConst;
+import com.zxy.nanonap.util.ButtonConst;
 import com.zxy.nanonap.util.ShakeUtil;
 import com.zxy.nanonap.util.TimerStatus;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,6 +104,15 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        }
+
         MyApplication.getInstance().setMainActivityContext(this);
 
         buttonGridView = findViewById(R.id.buttonGridView);
@@ -214,6 +231,10 @@ public class MainActivity extends Activity {
         alarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (playingButtonSet.size() == 0) {
+                    Toasty.warning(MainActivity.this, "请选择音乐进行播放。", Toast.LENGTH_SHORT, true).show();
+                    return;
+                }
                 ShakeUtil.startShakeByView(v,1f, 1f, 5f, 100);
                 Intent intent = new Intent(MainActivity.this, CountdownActivity.class);
                 startActivity(intent);
@@ -278,9 +299,6 @@ public class MainActivity extends Activity {
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         volumeAdapter = new VolumeAdapter(volumeItems, audioService);
         recyclerView.setAdapter(volumeAdapter);
-
-//        View parentView = (View) customVolumeView.getParent();
-//        parentView.setBackgroundColor(Color.RED);
 
         CustomBottomDialog.Builder builder = new CustomBottomDialog.Builder(MainActivity.this);
         builder.setTitle("调节音量")
@@ -384,7 +402,7 @@ public class MainActivity extends Activity {
     };
 
     /**
-     * 取消定时服务的绑定
+     * 取消定时服务的绑定并停止定时服务
      */
     public void cancleBindTimeService() {
         if (isServiceTimeBound) {
@@ -397,7 +415,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * 取消音乐服务的绑定
+     * 取消音乐服务的绑定并停止音乐服务
      */
     public void cancleBindMusicService() {
         if (isServiceBound) {
@@ -442,6 +460,61 @@ public class MainActivity extends Activity {
      */
     public void setCountTimerSecond(long mills) {
         countdownService.setCountDownTime(mills);
+    }
+
+    /**
+     * 返回剩余时间 毫秒
+     * @return
+     */
+    public long getLeftMills() {
+        return countdownService.getTimeLeftInMillis();
+    }
+
+    /**
+     * 移除时间计时前台服务
+     */
+    public void removeTimeForeService() {
+        countdownService.stopForeground(true);
+    }
+
+    /**
+     * 计时服务结束事件
+     */
+    public void timeEndEvent() {
+        // 清除掉音量list
+        volumeItems.clear();
+        // 当前计时状态 恢复未未开始计时
+        setCurTimerStatus(TimerStatus.NO_TIME_NO_START);
+        for (int position: playingButtonSet) {
+            System.out.println(position);
+            stopAudio(AudioConst.musicSourceList.get(position));
+            GridItem currentClickedItem = audioGridItem.get(position);
+            currentClickedItem.setIconResourceId(AudioConst.iconSourceList.get(position));
+            View childView = buttonGridView.getChildAt(position);
+            // 这里还要切换 button的样式
+            childView.setBackgroundResource(R.drawable.rounded_border_background_light);
+            ((ImageView) childView.findViewById(R.id.iconImageView)).setBackgroundResource(AudioConst.iconSourceList.get(position));
+            // 文字颜色也要变
+            ((TextView) childView.findViewById(R.id.textView)).setTextColor(Color.BLACK);
+        }
+        audioGridAdapter.notifyDataSetChanged();
+        playingButtonSet.clear();
+        // 清除service中资源
+        audioService.clearAllRes();
+        // 改变计时页面的按钮状态
+        if (null != MyApplication.getInstance().getCountActivityContext()){
+            ((CountdownActivity) MyApplication.getInstance().getCountActivityContext()).finish();
+        }
+        // 按钮恢复到暂停
+        playPauseButton.setImageResource(R.drawable.ic_play_white);
+        // 去掉计时前台服务
+        removeTimeForeService();
+        // 计时服务停止(但未取消绑定)
+        Intent timeIntent = new Intent(this, CountdownService.class);
+        stopService(timeIntent);
+        // 音乐播放服务停止(但未取消绑定)
+        Intent musicIntent = new Intent(this, AudioService.class);
+        stopService(musicIntent);
     }
 
 }

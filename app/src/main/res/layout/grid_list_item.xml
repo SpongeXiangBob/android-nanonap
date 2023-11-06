@@ -22,6 +22,7 @@
         android:textSize="13sp"
         android:maxLines="1"
         android:text="Label"
+        android:textColor="@color/black"
         android:textAlignment="center"
         android:gravity="center" /> <!-- 文字居中显示 -->
 

@@ -14,8 +14,10 @@
 
         <ImageButton
             android:id="@+id/finishButton"
-            android:layout_width="50dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:src="@drawable/xiahua_black"
+            android:background="#00000000"
             android:layout_centerHorizontal="true"
             />
 
@@ -30,7 +32,7 @@
                 android:id="@+id/countdownTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:text="测试文字"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
@@ -50,13 +52,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/clock_on_black"
+                    android:background="@drawable/bg_go"
+                    android:scaleType="fitXY"
+                    android:padding="25dp"
                     android:text="开始" />
+
 
                 <ImageButton
                     android:id="@+id/pauseButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/clock_pause_black"
+                    android:background="@drawable/bg_go"
+                    android:scaleType="fitXY"
+                    android:padding="25dp"
+                    android:layout_marginLeft="50dp"
                     android:text="暂停" />
 
             </LinearLayout>
@@ -65,7 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/topLinearLayout"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="55dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -74,6 +84,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/clock_resume_black"
+                    android:background="@drawable/bg_go"
+                    android:scaleType="fitXY"
+                    android:padding="25dp"
                     android:text="重置" />
 
                 <ImageButton
@@ -81,6 +94,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/clock_select_black"
+                    android:background="@drawable/bg_go"
+                    android:scaleType="fitXY"
+                    android:padding="25dp"
+                    android:layout_marginLeft="50dp"
                     android:text="选择时间" />
             </LinearLayout>
 
