@@ -215,7 +215,7 @@ public class AudioService extends Service {
 
         // 创建通知内容
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.mogui)
+                .setSmallIcon(R.drawable.music_black)
                 .setContentTitle("【正在使用音频服务】")
                 .setContentText("小翔翔提醒你【早点休息吧，晚安鸭！！！】")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
