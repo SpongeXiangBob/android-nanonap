@@ -87,6 +87,7 @@ public class MainActivity extends Activity {
 
     private AudioService audioService;
     private boolean isServiceBound = false;
+    private long mExitTime;
 //    private boolean isPlaying = false;
 
     /**
@@ -128,22 +129,22 @@ public class MainActivity extends Activity {
         audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(3),AudioConst.musicSourceNameList.get(3)));
         audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(4),AudioConst.musicSourceNameList.get(4)));
         audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
-        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
+//        audioGridItem.add(new GridItem(AudioConst.iconSourceList.get(5),AudioConst.musicSourceNameList.get(5)));
 
         audioGridAdapter = new AudioGridAdapter(this, audioGridItem);
         // 设置自定义适配器
@@ -316,8 +317,14 @@ public class MainActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Toasty.warning(MainActivity.this, "应用程序已切换至后台。", Toast.LENGTH_SHORT, true).show();
-            moveTaskToBack(false);
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                Toasty.info(MainActivity.this, "再按一次退出至后台。", Toast.LENGTH_SHORT, true).show();
+                mExitTime = System.currentTimeMillis();
+            } else {
+                Toasty.warning(MainActivity.this, "应用程序已切换至后台。", Toast.LENGTH_SHORT, true).show();
+                moveTaskToBack(false);
+                return true;
+            }
             return true;
         }
         return super.onKeyDown(keyCode, event);
